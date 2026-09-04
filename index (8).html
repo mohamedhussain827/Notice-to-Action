@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notice-to-Action</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B2430;
+  --ink-2:#262F3D;
+  --paper:#FAF7EF;
+  --paper-2:#F1ECE0;
+  --card:#FFFFFF;
+  --highlighter:#FFC93C;
+  --highlighter-ink:#7A5B00;
+  --green:#2F6B4F;
+  --green-bg:#E7F1EB;
+  --coral:#D64550;
+  --coral-bg:#FBE7E8;
+  --amber-bg:#FFF4DA;
+  --line:#E4DDCB;
+  --ink-soft:#6B7280;
+  --ink-faint:#9AA1AC;
+  --radius-s:6px;
+  --radius-m:10px;
+  --radius-l:18px;
+  --shadow:0 1px 2px rgba(27,36,48,.06), 0 8px 24px -12px rgba(27,36,48,.18);
+  --serif:'Source Serif 4', Georgia, serif;
+  --sans:'Inter', -apple-system, sans-serif;
+  --mono:'JetBrains Mono', monospace;
+}
+[data-theme="dark"]{
+  --ink:#F3F1EA;
+  --paper:#14181F;
+  --paper-2:#1C222C;
+  --card:#1E2530;
+  --line:#2B3341;
+  --ink-soft:#A2A9B5;
+  --ink-faint:#6E7684;
+  --amber-bg:#3A2E10;
+  --green-bg:#173226;
+  --coral-bg:#3A181A;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html, body{height:100%;}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+input,textarea,select{font-family:inherit; color:inherit;}
+::selection{background:var(--highlighter); color:var(--ink);}
+h1,h2,h3,h4{font-family:var(--serif); font-weight:600; line-height:1.15; letter-spacing:-0.01em;}
+.serif{font-family:var(--serif);}
+.mono{font-family:var(--mono);}
+
+/* ---------- Layout shell ---------- */
+#app{min-height:100vh;}
+.shell{display:flex; min-height:100vh;}
+.sidebar{
+  width:236px; flex-shrink:0; background:var(--ink); color:#EDEAE0;
+  display:flex; flex-direction:column; padding:22px 16px; position:sticky; top:0; height:100vh;
+}
+[data-theme="dark"] .sidebar{background:#0D1015;}
+.sidebar .brand{display:flex; align-items:center; gap:10px; padding:4px 8px 22px 8px;}
+.sidebar .brand .mark{
+  width:30px; height:30px; border-radius:8px; background:var(--highlighter);
+  display:flex; align-items:center; justify-content:center; color:var(--ink); font-family:var(--serif); font-weight:700; font-size:16px;
+}
+.sidebar .brand .name{font-family:var(--serif); font-weight:600; font-size:16.5px; color:#fff;}
+.navgroup{display:flex; flex-direction:column; gap:2px; margin-top:6px;}
+.navitem{
+  display:flex; align-items:center; gap:11px; padding:9px 10px; border-radius:8px;
+  font-size:14px; color:#C7C4B8; transition:background .12s;
+}
+.navitem svg{width:17px; height:17px; flex-shrink:0; opacity:.85;}
+.navitem:hover{background:rgba(255,255,255,.06); color:#fff;}
+.navitem.active{background:rgba(255,201,60,.14); color:var(--highlighter); font-weight:600;}
+.navitem .badge{
+  margin-left:auto; background:var(--coral); color:#fff; font-size:10.5px; font-weight:700;
+  padding:1px 6px; border-radius:20px; font-family:var(--sans);
+}
+.sidebar-foot{margin-top:auto; padding-top:14px; border-top:1px solid rgba(255,255,255,.08);}
+.role-pill{
+  font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-faint);
+  padding:2px 8px; border:1px solid rgba(255,255,255,.14); border-radius:20px; display:inline-block; margin-bottom:10px;
+}
+.user-chip{display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px;}
+.user-chip:hover{background:rgba(255,255,255,.06);}
+.avatar{
+  width:30px; height:30px; border-radius:50%; background:var(--highlighter); color:var(--ink);
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0;
+}
+.user-chip .u-name{font-size:13.5px; font-weight:600; color:#fff;}
+.user-chip .u-email{font-size:11.5px; color:var(--ink-faint);}
+
+.main{flex:1; min-width:0; display:flex; flex-direction:column;}
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; padding:16px 32px;
+  border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--paper); z-index:5;
+}
+.topbar-search{
+  display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--line);
+  border-radius:9px; padding:8px 12px; width:320px; color:var(--ink-soft); font-size:13.5px;
+}
+.topbar-search svg{width:15px; height:15px; opacity:.6;}
+.topbar-search input{background:none; border:none; outline:none; width:100%; font-size:13.5px; color:var(--ink);}
+.topbar-actions{display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  background:var(--card); border:1px solid var(--line); position:relative;
+}
+.icon-btn svg{width:17px; height:17px;}
+.icon-btn:hover{border-color:var(--ink-soft);}
+.dot{position:absolute; top:7px; right:7px; width:7px; height:7px; border-radius:50%; background:var(--coral); border:1.5px solid var(--paper);}
+.content{padding:28px 32px 60px 32px; max-width:1180px; width:100%; margin:0 auto;}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:10px 18px; border-radius:9px; font-size:13.5px; font-weight:600; transition:all .12s; white-space:nowrap;
+}
+.btn svg{width:15px; height:15px;}
+.btn-primary{background:var(--ink); color:var(--paper);}
+[data-theme="dark"] .btn-primary{background:var(--highlighter); color:var(--ink);}
+.btn-primary:hover{opacity:.88;}
+.btn-highlight{background:var(--highlighter); color:var(--ink);}
+.btn-highlight:hover{filter:brightness(0.96);}
+.btn-ghost{background:transparent; border:1px solid var(--line); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-soft);}
+.btn-text{color:var(--ink-soft); font-weight:600; font-size:13.5px;}
+.btn-text:hover{color:var(--ink);}
+.btn-sm{padding:6px 12px; font-size:12.5px;}
+.btn-danger{background:var(--coral-bg); color:var(--coral);}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+.btn-block{width:100%;}
+
+/* ---------- Cards / misc ---------- */
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-l); padding:20px;}
+.card-flat{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-m); padding:16px;}
+.pill{display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700;}
+.pill-high{background:var(--coral-bg); color:var(--coral);}
+.pill-medium{background:var(--amber-bg); color:var(--highlighter-ink);}
+.pill-low{background:var(--green-bg); color:var(--green);}
+.pill-neutral{background:var(--paper-2); color:var(--ink-soft);}
+.progress{height:7px; border-radius:20px; background:var(--paper-2); overflow:hidden;}
+.progress > div{height:100%; background:var(--green); border-radius:20px;}
+.checkline{display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--line);}
+.checkline:last-child{border-bottom:none;}
+.checkbox{
+  width:19px; height:19px; border-radius:5px; border:1.6px solid var(--ink-faint); flex-shrink:0; margin-top:1px;
+  display:flex; align-items:center; justify-content:center; transition:all .12s;
+}
+.checkbox.done{background:var(--green); border-color:var(--green);}
+.checkbox svg{width:12px; height:12px; color:#fff; opacity:0;}
+.checkbox.done svg{opacity:1;}
+.checkline.done .clabel{text-decoration:line-through; color:var(--ink-faint);}
+.divider{height:1px; background:var(--line); margin:20px 0;}
+.section-label{font-size:11.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-faint); font-weight:700; margin-bottom:10px;}
+input[type=text],input[type=email],input[type=password],input[type=date],textarea,select{
+  width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:9px; background:var(--card);
+  font-size:13.5px; outline:none; transition:border-color .12s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--ink);}
+label.field-label{font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:6px; display:block;}
+.field{margin-bottom:16px;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.toast{
+  position:fixed; bottom:24px; right:24px; background:var(--ink); color:var(--paper); padding:13px 20px;
+  border-radius:10px; font-size:13.5px; font-weight:600; box-shadow:var(--shadow); z-index:100; display:flex; align-items:center; gap:9px;
+}
+[data-theme="dark"] .toast{background:var(--highlighter); color:var(--ink);}
+.toast svg{width:16px; height:16px;}
+
+/* ---------- Landing ---------- */
+.landing-nav{
+  display:flex; align-items:center; justify-content:space-between; padding:20px 48px; max-width:1280px; margin:0 auto;
+}
+.hero{padding:64px 48px 40px 48px; max-width:1280px; margin:0 auto; display:grid; grid-template-columns:1.05fr 1fr; gap:56px; align-items:center;}
+.hero h1{font-size:52px; letter-spacing:-0.02em;}
+.hero .lede{font-size:16.5px; color:var(--ink-soft); margin-top:18px; max-width:480px; line-height:1.6;}
+.hero-cta{display:flex; gap:12px; margin-top:30px;}
+.mark-swipe{
+  background:linear-gradient(100deg, transparent 0%, transparent 40%, var(--highlighter) 40%, var(--highlighter) 100%);
+  background-size:250% 100%; background-position:100% 0;
+  animation:swipe 1.4s .4s ease forwards;
+}
+@keyframes swipe{ to{background-position:0 0;} }
+.hero-visual{position:relative;}
+.notice-paper{
+  background:var(--card); border:1px solid var(--line); border-radius:14px; padding:26px; box-shadow:var(--shadow);
+  font-family:var(--serif); position:relative;
+}
+.notice-paper .stamp{position:absolute; top:16px; right:18px; font-size:10px; letter-spacing:.08em; color:var(--ink-faint); font-family:var(--sans); font-weight:700; border:1px solid var(--line); padding:3px 8px; border-radius:20px;}
+.notice-paper h4{font-size:15px; margin-bottom:10px;}
+.notice-paper p{font-size:12.5px; line-height:1.7; color:var(--ink-soft); font-family:var(--serif);}
+.arrow-flow{display:flex; align-items:center; justify-content:center; gap:10px; margin:16px 0; color:var(--ink-faint); font-size:11.5px; font-weight:700; letter-spacing:.06em;}
+.arrow-flow svg{width:16px; height:16px;}
+.task-card-mini{background:var(--ink); color:var(--paper); border-radius:14px; padding:22px; box-shadow:var(--shadow);}
+[data-theme="dark"] .task-card-mini{background:var(--highlighter); color:var(--ink);}
+.task-card-mini .tag{font-size:10.5px; font-weight:700; letter-spacing:.05em; opacity:.7; margin-bottom:8px;}
+.task-card-mini h4{font-size:16px; margin-bottom:12px; font-family:var(--serif); color:inherit;}
+.mini-check{display:flex; align-items:center; gap:8px; font-size:12.5px; padding:5px 0; opacity:.92;}
+.mini-check .b{width:14px; height:14px; border-radius:4px; border:1.5px solid currentColor; flex-shrink:0;}
+
+.how-section{padding:56px 48px; max-width:1280px; margin:0 auto;}
+.how-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:32px;}
+.how-card{padding:26px; border:1px solid var(--line); border-radius:var(--radius-l); background:var(--card);}
+.how-card .num{font-family:var(--mono); font-size:12px; color:var(--highlighter-ink); background:var(--amber-bg); display:inline-block; padding:3px 9px; border-radius:6px; margin-bottom:14px;}
+.how-card h3{font-size:18px; margin-bottom:8px;}
+.how-card p{font-size:13.5px; color:var(--ink-soft); line-height:1.6;}
+
+.cats-strip{display:flex; flex-wrap:wrap; gap:10px; padding:0 48px 64px 48px; max-width:1280px; margin:0 auto;}
+.cat-chip{padding:8px 16px; border-radius:20px; border:1px solid var(--line); font-size:12.5px; font-weight:600; background:var(--card);}
+
+.landing-footer{border-top:1px solid var(--line); padding:26px 48px; display:flex; justify-content:space-between; align-items:center; max-width:1280px; margin:0 auto; font-size:12.5px; color:var(--ink-faint);}
+
+/* ---------- Auth ---------- */
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:42px;}
+.pw-toggle{
+  position:absolute; right:4px; top:50%; transform:translateY(-50%); width:32px; height:32px;
+  display:flex; align-items:center; justify-content:center; border-radius:7px; color:var(--ink-soft);
+}
+.pw-toggle:hover{background:var(--paper-2); color:var(--ink);}
+.pw-toggle svg{width:16px; height:16px;}
+.pw-feedback{font-size:11.5px; margin-top:7px; line-height:1.5; min-height:14px;}
+.auth-wrap{min-height:100vh; min-height:100dvh; width:100%; display:flex; align-items:center; justify-content:center; padding:32px;}
+.auth-box{width:100%; max-width:400px; margin:0 auto;}
+.auth-box .mark{width:38px; height:38px; border-radius:10px; background:var(--highlighter); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; margin-bottom:20px;}
+.role-select{display:flex; gap:8px; margin-bottom:20px;}
+.role-opt{flex:1; padding:10px; border:1.5px solid var(--line); border-radius:9px; text-align:center; font-size:12.5px; font-weight:600; color:var(--ink-soft);}
+.role-opt.sel{border-color:var(--ink); background:var(--paper-2); color:var(--ink);}
+
+/* ---------- Dashboard ---------- */
+.page-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:26px;}
+.page-head h1{font-size:26px;}
+.page-head .sub{color:var(--ink-soft); font-size:13.5px; margin-top:4px;}
+.stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px;}
+.stat-card{padding:18px 20px;}
+.stat-card .n{font-family:var(--serif); font-size:30px; font-weight:600;}
+.stat-card .l{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+.two-col{display:grid; grid-template-columns:1.3fr 1fr; gap:20px; align-items:start;}
+.deadline-row{display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line);}
+.deadline-row:last-child{border-bottom:none;}
+.deadline-row .dl-title{font-weight:600; font-size:13.8px;}
+.deadline-row .dl-meta{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+.quick-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px;}
+.qa-btn{
+  display:flex; flex-direction:column; gap:8px; align-items:flex-start; padding:16px; border:1px solid var(--line);
+  border-radius:var(--radius-m); background:var(--card);
+}
+.qa-btn:hover{border-color:var(--ink-soft);}
+.qa-btn svg{width:18px; height:18px;}
+.qa-btn span{font-size:12.8px; font-weight:600;}
+
+/* ---------- Notice card list ---------- */
+.notice-card{display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--line);}
+.notice-card:last-child{border-bottom:none;}
+.cat-icon{width:38px; height:38px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:var(--paper-2);}
+.cat-icon svg{width:18px; height:18px;}
+.notice-card .body{flex:1; min-width:0;}
+.notice-card .row1{display:flex; align-items:center; gap:8px; justify-content:space-between;}
+.notice-card .ttl{font-weight:600; font-size:14.5px;}
+.notice-card .meta{font-size:12px; color:var(--ink-soft); margin-top:3px; display:flex; gap:12px;}
+
+/* ---------- Analyze flow ---------- */
+.analyze-loading{max-width:460px; margin:60px auto; text-align:center;}
+.analyze-step{display:flex; align-items:center; gap:10px; padding:10px 16px; border:1px solid var(--line); border-radius:9px; margin-bottom:8px; font-size:13.5px; text-align:left; opacity:0; animation:fadein .4s forwards;}
+.analyze-step svg{width:16px; height:16px; color:var(--green); flex-shrink:0;}
+@keyframes fadein{ to{opacity:1;} }
+.extract-hint{font-size:11.5px; color:var(--ink-faint); font-style:italic;}
+.not-specified{color:var(--ink-faint); font-style:italic;}
+.warn-box{display:flex; gap:10px; padding:12px 14px; background:var(--amber-bg); border-radius:9px; font-size:12.8px; color:var(--highlighter-ink); align-items:flex-start;}
+.warn-box svg{width:16px; height:16px; flex-shrink:0; margin-top:1px;}
+.method-tabs{display:flex; gap:8px; margin-bottom:20px;}
+.mtab{padding:9px 16px; border-radius:9px; border:1px solid var(--line); font-size:13px; font-weight:600; color:var(--ink-soft);}
+.mtab.active{background:var(--ink); color:var(--paper);}
+[data-theme="dark"] .mtab.active{background:var(--highlighter); color:var(--ink);}
+.doc-chip{display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1px solid var(--line); border-radius:8px; font-size:12.8px; margin:4px 6px 0 0;}
+.doc-chip svg{width:14px; height:14px;}
+.upload-drop{border:1.5px dashed var(--line); border-radius:var(--radius-m); padding:36px; text-align:center; color:var(--ink-soft); cursor:pointer; transition:border-color .12s;}
+.upload-drop:hover{border-color:var(--ink-soft);}
+.file-preview{display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+.file-preview .thumb{width:44px; height:44px; border-radius:8px; object-fit:cover; flex-shrink:0; background:var(--paper-2);}
+.file-preview .doc-thumb{width:44px; height:44px; border-radius:8px; background:var(--amber-bg); color:var(--highlighter-ink); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.file-preview .doc-thumb svg{width:20px; height:20px;}
+.file-preview .fname{font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.file-preview .fsize{font-size:11.5px; color:var(--ink-faint);}
+
+/* ---------- Calendar ---------- */
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:14px;}
+.cal-dow{font-size:11px; text-align:center; color:var(--ink-faint); font-weight:700; padding-bottom:4px;}
+.cal-cell{
+  min-height:64px; border:1px solid var(--line); border-radius:8px; padding:6px; font-size:12px; position:relative; cursor:pointer;
+}
+.cal-cell:hover{border-color:var(--ink-soft);}
+.cal-cell.empty{border:none;}
+.cal-cell.today{background:var(--amber-bg); border-color:var(--highlighter);}
+.cal-cell.sel{outline:1.5px solid var(--ink);}
+.cal-dot{width:6px; height:6px; border-radius:50%; background:var(--coral); position:absolute; bottom:6px; left:6px;}
+
+/* ---------- Tabs ---------- */
+.tab-row{display:flex; gap:4px; border-bottom:1px solid var(--line); margin-bottom:18px;}
+.tab-item{padding:10px 4px; margin-right:22px; font-size:13.5px; font-weight:600; color:var(--ink-soft); border-bottom:2px solid transparent; position:relative; top:1px;}
+.tab-item.active{color:var(--ink); border-bottom-color:var(--ink);}
+[data-theme="dark"] .tab-item.active{border-bottom-color:var(--highlighter);}
+
+/* ---------- Notif ---------- */
+.notif-row{display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--line);}
+.notif-row.unread{background:var(--amber-bg); margin:0 -14px; padding:14px; border-radius:8px; border-bottom:none;}
+.notif-dot-lead{width:8px; height:8px; border-radius:50%; margin-top:6px; flex-shrink:0;}
+
+/* ---------- Settings ---------- */
+.switch{width:38px; height:22px; border-radius:20px; background:var(--paper-2); border:1px solid var(--line); position:relative; flex-shrink:0;}
+.switch.on{background:var(--green);}
+.switch .knob{width:16px; height:16px; border-radius:50%; background:#fff; position:absolute; top:2px; left:2px; transition:left .15s; box-shadow:0 1px 2px rgba(0,0,0,.2);}
+.switch.on .knob{left:18px;}
+.setting-row{display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line);}
+.setting-row:last-child{border-bottom:none;}
+.setting-row .st{font-size:13.8px; font-weight:600;}
+.setting-row .sd{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+
+/* ---------- Empty ---------- */
+.empty-state{text-align:center; padding:50px 20px; color:var(--ink-soft);}
+.empty-state svg{width:34px; height:34px; margin-bottom:12px; opacity:.4;}
+.empty-state .t{font-weight:600; color:var(--ink); margin-bottom:4px;}
+.empty-state .d{font-size:13px;}
+
+@media (max-width:900px){
+  .sidebar{display:none;}
+  .hero{grid-template-columns:1fr; padding:36px 20px;}
+  .hero h1{font-size:36px;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .content{padding:20px;}
+  .topbar{padding:14px 18px;}
+  .topbar-search{display:none;}
+  .how-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============================= ICONS ============================= */
+const ICONS = {
+  home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7M5 10v10h14V10" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  notice:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke-linecap="round"/></svg>`,
+  tasks:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="4" width="18" height="16" rx="2.5"/></svg>`,
+  cal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/></svg>`,
+  bell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 01-3.4 0" stroke-linecap="round"/></svg>`,
+  search:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>`,
+  user:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg>`,
+  gear:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 12a7.4 7.4 0 00-.1-1l2-1.6-2-3.4-2.4.6a7.6 7.6 0 00-1.7-1l-.4-2.5H9.2l-.4 2.5a7.6 7.6 0 00-1.7 1l-2.4-.6-2 3.4 2 1.6a7.4 7.4 0 000 2l-2 1.6 2 3.4 2.4-.6a7.6 7.6 0 001.7 1l.4 2.5h5.6l.4-2.5a7.6 7.6 0 001.7-1l2.4.6 2-3.4-2-1.6c.1-.3.1-.7.1-1z"/></svg>`,
+  plus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>`,
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  doc:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  arrow:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  chevD:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  sun:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke-linecap="round"/></svg>`,
+  moon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  warn:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>`,
+  logout:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  clip:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`,
+  upload:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  edit:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  award:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  book:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V4H6.5A2.5 2.5 0 004 6.5v13z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20" stroke-linecap="round"/></svg>`,
+  briefcase:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" stroke-linecap="round"/></svg>`,
+  layers:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l9 5-9 5-9-5 9-5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  clock:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  trend:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8M15 7h6v6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  users:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-4 3.1-6.5 7-6.5s7 2.5 7 6.5" stroke-linecap="round"/><circle cx="18" cy="9" r="2.8"/><path d="M16 14.5c2.8.4 5 2.5 5 6.5" stroke-linecap="round"/></svg>`,
+  shield:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3.5v5c0 5-3.4 8.5-8 9.5-4.6-1-8-4.5-8-9.5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  eye:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>`,
+  eyeOff:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.9 17.9A10.9 10.9 0 0112 19c-7 0-11-7-11-7a20.3 20.3 0 015.1-5.9M9.9 4.2A10.4 10.4 0 0112 4c7 0 11 7 11 7a20.5 20.5 0 01-3.2 4.1M14.1 14.1a3 3 0 11-4.2-4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 1l22 22" stroke-linecap="round"/></svg>`,
+};
+const svgOf = k => ICONS[k] || '';
+
+/* ============================= STATE ============================= */
+let S = {
+  route: 'landing',
+  theme: 'light',
+  session: null,           // {name,email,role,department,year}
+  notices: [],
+  tasks: [],
+  notifications: [],
+  toast: null,
+  authMode: 'login',
+  authRole: 'student',
+  addMethod: 'paste',
+  facultyAttachment: null,
+  pendingExtract: null,
+  analyzing: false,
+  noticeDraft: '',
+  taskTab: 'all',
+  searchQuery: '',
+  searchCat: 'All',
+  calMonth: 8, calYear: 2026, calSelected: 3,
+  settings: {deadlineReminders:true, newNotices:true, taskCompletion:true, importantNotices:true, defaultReminder:'2', appearance:'light'},
+};
+let saveTimer=null;
+function persist(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async ()=>{
+    try{
+      await window.storage.set('ntoa-state', JSON.stringify({
+        session:S.session, notices:S.notices, tasks:S.tasks, notifications:S.notifications,
+        theme:S.theme, settings:S.settings
+      }));
+    }catch(e){ console.warn('save failed', e); }
+  }, 250);
+}
+async function loadPersisted(){
+  try{
+    const r = await window.storage.get('ntoa-state');
+    if(r && r.value){
+      const d = JSON.parse(r.value);
+      Object.assign(S, d);
+    }
+  }catch(e){ /* no data yet */ }
+}
+
+/* ============================= DEMO SEED ============================= */
+const CATS = ['Academic','Examination','Scholarship','Placement','Internship','Assignment','Events','Workshop','Fees','Registration','General'];
+const CAT_ICON = {Academic:'book', Examination:'clip', Scholarship:'award', Placement:'briefcase', Internship:'briefcase', Assignment:'edit', Events:'layers', Workshop:'layers', Fees:'doc', Registration:'doc', General:'notice'};
+
+function seedDemo(){
+  const mk = (o)=>Object.assign({id:'n'+Math.random().toString(36).slice(2,9), createdAt:'2026-09-03'}, o);
+  S.notices = [
+    mk({title:'Scholarship Renewal Submission', category:'Scholarship', target:'2nd Year CSE', deadline:'2026-09-15', priority:'High',
+      description:'All second-year CSE students are required to submit the scholarship renewal form along with their income certificate and Aadhaar copy on or before September 15.',
+      documents:['Scholarship Form','Income Certificate','Aadhaar Copy'],
+      actions:[['Download scholarship form',true],['Fill in required details',true],['Obtain income certificate',false],['Attach Aadhaar copy',false],['Submit completed form',false]],
+      source:'Finance & Scholarship Office'}),
+    mk({title:'End Semester Examination Registration', category:'Examination', target:'All Final Year Students', deadline:'2026-09-18', priority:'High',
+      description:'All students are requested to complete the examination registration form and pay the exam fee before September 18.',
+      documents:['Registration Form','Fee Payment Receipt'],
+      actions:[['Download registration form',true],['Pay examination fee',false],['Submit form to department office',false]],
+      source:'Examination Cell'}),
+    mk({title:'Web Development Workshop', category:'Workshop', target:'All Departments', deadline:'2026-09-17', priority:'Medium',
+      description:'A hands-on web development workshop will be held on September 20. Interested students must register before September 17.',
+      documents:['Not specified in the notice'],
+      actions:[['Register on the workshop portal',false],['Confirm attendance',false]],
+      source:'Computer Science Department'}),
+    mk({title:'Mini Project Proposal Submission', category:'Assignment', target:'3rd Year Students', deadline:'2026-09-12', priority:'High',
+      description:'Teams must submit their mini project proposal including project title, team members and problem statement before September 12.',
+      documents:['Proposal Document'],
+      actions:[['Finalize project title',true],['List team members',true],['Write problem statement',false],['Submit proposal',false]],
+      source:'Project Coordination Committee'}),
+  ];
+  S.tasks = [];
+  S.notices.forEach(n=>{
+    n.actions.forEach(([label,done],i)=>{
+      S.tasks.push({id:'t'+Math.random().toString(36).slice(2,9), noticeId:n.id, name:label, deadline:n.deadline, priority:n.priority, status: done?'Completed':'Pending'});
+    });
+  });
+  S.notifications = [
+    {id:'no1', level:'high', msg:'Scholarship Renewal deadline is in 2 days.', time:'2h ago', read:false, noticeId:S.notices[0].id},
+    {id:'no2', level:'medium', msg:'End Semester Examination Registration deadline is approaching.', time:'6h ago', read:false, noticeId:S.notices[1].id},
+    {id:'no3', level:'low', msg:'Mini Project — "Finalize project title" marked complete.', time:'1d ago', read:true, noticeId:S.notices[3].id},
+    {id:'no4', level:'info', msg:'New notice published for your department: Web Development Workshop.', time:'2d ago', read:true, noticeId:S.notices[2].id},
+  ];
+}
+
+/* ============================= EXTRACTION ("AI") ============================= */
+const DOC_KEYWORDS = ['income certificate','aadhaar','aadhar','passport-size photograph','passport size photograph','photograph','marksheet','mark sheet','id card','fee receipt','registration form','application form','bonafide certificate','caste certificate','medical certificate','transfer certificate','proposal','no objection certificate','noc'];
+const CAT_KEYWORDS = {
+  Scholarship:['scholarship'], Examination:['exam','examination'], Placement:['placement','recruit','company drive','interview'],
+  Internship:['internship','intern'], Assignment:['assignment','project','proposal'], Events:['fest','event','cultural'],
+  Workshop:['workshop','seminar','webinar'], Fees:['fee','fees','payment due'], Registration:['registration','register','enroll'],
+  Academic:['syllabus','curriculum','academic','class'], General:[]
+};
+const MONTHS = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+
+function extractNotice(text){
+  const lower = text.toLowerCase();
+  // Title: first sentence-ish, capped
+  let title = text.split(/[.\n]/)[0].trim();
+  if(title.length > 70) title = title.slice(0,67)+'…';
+  if(!title) title = 'Untitled Notice';
+
+  // Category
+  let category = 'General';
+  for(const c of CATS){
+    const kws = CAT_KEYWORDS[c] || [];
+    if(kws.some(k=>lower.includes(k))){ category = c; break; }
+  }
+
+  // Deadline — look for "before/by/on <Month> <day>"
+  let deadline = null;
+  const dateRe = new RegExp('(?:before|by|on|on or before)\\s+([a-z]+)\\s+(\\d{1,2})(?:st|nd|rd|th)?','i');
+  const m = text.match(dateRe);
+  if(m && MONTHS.includes(m[1].toLowerCase())){
+    const mi = MONTHS.indexOf(m[1].toLowerCase())+1;
+    deadline = `2026-${String(mi).padStart(2,'0')}-${String(parseInt(m[2])).padStart(2,'0')}`;
+  } else {
+    const bare = text.match(new RegExp('\\b('+MONTHS.join('|')+')\\s+(\\d{1,2})(?:st|nd|rd|th)?\\b','i'));
+    if(bare){
+      const mi = MONTHS.indexOf(bare[1].toLowerCase())+1;
+      deadline = `2026-${String(mi).padStart(2,'0')}-${String(parseInt(bare[2])).padStart(2,'0')}`;
+    }
+  }
+
+  // Target audience
+  let target = null;
+  const yearM = text.match(/(first|second|third|fourth|1st|2nd|3rd|4th|final)[\s-]?year/i);
+  const deptM = text.match(/\b(CSE|ECE|EEE|ME|MECH|CIVIL|IT|MBA|MCA|AIML|AI\/ML)\b/i);
+  if(yearM || deptM){ target = [yearM?yearM[0]:'', deptM?deptM[0].toUpperCase():''].filter(Boolean).join(' '); }
+  else if(/all students/i.test(text)) target = 'All Students';
+
+  // Priority
+  let priority = 'Medium';
+  if(['Scholarship','Examination','Fees'].includes(category) || /mandatory|compulsory|must|immediately/i.test(text)) priority = 'High';
+  if(category==='Events' || category==='Workshop') priority = 'Medium';
+  if(/optional|may attend/i.test(text)) priority = 'Low';
+
+  // Documents
+  let documents = DOC_KEYWORDS.filter(k=>lower.includes(k)).map(d=>d.replace(/\b\w/g,c=>c.toUpperCase()));
+  documents = [...new Set(documents)];
+  if(documents.length===0) documents = [];
+
+  // Actions
+  let actions = [];
+  if(documents.length){
+    actions.push('Download the required form');
+    documents.forEach(d=> actions.push(`Obtain / attach ${d}`));
+    actions.push('Submit before the deadline');
+  } else {
+    actions = ['Read the full notice carefully', 'Confirm whether this applies to you', 'Complete the required step before the deadline'];
+  }
+
+  return {title, category, deadline, target, priority, documents, actions, description:text.trim()};
+}
+
+/* ============================= HELPERS ============================= */
+function fmtDate(iso){
+  if(!iso) return null;
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('en-US',{month:'short', day:'numeric'});
+}
+function daysUntil(iso){
+  if(!iso) return null;
+  const today = new Date('2026-09-03T00:00:00');
+  const d = new Date(iso+'T00:00:00');
+  return Math.round((d-today)/86400000);
+}
+function priorityPillClass(p){ return p==='High'?'pill-high':p==='Medium'?'pill-medium':p==='Low'?'pill-low':'pill-neutral'; }
+function noticeById(id){ return S.notices.find(n=>n.id===id); }
+function tasksForNotice(id){ return S.tasks.filter(t=>t.noticeId===id); }
+function progressForNotice(id){
+  const ts = tasksForNotice(id);
+  if(!ts.length) return 0;
+  return Math.round(100*ts.filter(t=>t.status==='Completed').length/ts.length);
+}
+function showToast(msg){
+  S.toast = msg; render();
+  setTimeout(()=>{ S.toast=null; render(); }, 2600);
+}
+function go(route, extra){ S.route = route; if(extra) Object.assign(S, extra); window.scrollTo(0,0); render(); }
+
+/* ============================= RENDER: SHELL ============================= */
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+
+function navItems(){
+  const role = S.session ? S.session.role : 'student';
+  if(role==='faculty'){
+    return [['faculty','home','Dashboard'],['faculty-create','notice','Create Notice'],['faculty-published','clip','Published Notices'],['profile','user','Profile'],['settings','gear','Settings']];
+  }
+  if(role==='admin'){
+    return [['admin','home','Dashboard'],['admin-users','users','Users'],['admin-notices','notice','Notices'],['admin-cats','layers','Categories'],['settings','gear','Settings']];
+  }
+  return [
+    ['dashboard','home','Dashboard'],
+    ['browse','notice','Notices'],
+    ['tasks','tasks','My Tasks', S.tasks.filter(t=>t.status!=='Completed').length],
+    ['calendar','cal','Calendar'],
+    ['notifications','bell','Notifications', S.notifications.filter(n=>!n.read).length],
+    ['search','search','Search'],
+    ['profile','user','Profile'],
+    ['settings','gear','Settings'],
+  ];
+}
+
+function renderSidebar(){
+  const items = navItems();
+  const s = S.session;
+  return `
+  <div class="sidebar">
+    <div class="brand"><div class="mark">N</div><div class="name">Notice-to-Action</div></div>
+    <div class="navgroup">
+      ${items.map(([r,icon,label,badge])=>`
+        <a class="navitem ${S.route===r?'active':''}" onclick="go('${r}')">
+          ${svgOf(icon)}<span>${label}</span>
+          ${badge?`<span class="badge">${badge}</span>`:''}
+        </a>`).join('')}
+    </div>
+    <div class="sidebar-foot">
+      <span class="role-pill">${s.role}</span>
+      <div class="user-chip" onclick="go('profile')" style="cursor:pointer">
+        <div class="avatar">${s.name.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+        <div style="min-width:0;flex:1">
+          <div class="u-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
+          <div class="u-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.email}</div>
+        </div>
+      </div>
+      <a class="navitem" onclick="logout()" style="margin-top:4px">${svgOf('logout')}<span>Log out</span></a>
+    </div>
+  </div>`;
+}
+
+function renderTopbar(title){
+  const unread = S.notifications.filter(n=>!n.read).length;
+  return `
+  <div class="topbar">
+    <div class="topbar-search" onclick="go('search')">
+      ${svgOf('search')}<input placeholder="Search notices, tasks…" readonly>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">${svgOf(S.theme==='dark'?'sun':'moon')}</button>
+      <button class="icon-btn" onclick="go('notifications')" title="Notifications">${svgOf('bell')}${unread?'<span class="dot"></span>':''}</button>
+      ${S.session.role!=='student' ? `<button class="btn btn-highlight btn-sm" onclick="go('${S.session.role==='faculty'?'faculty-create':'admin'}')">${S.session.role==='faculty'?'New Notice':'Admin Tools'}</button>`:
+      `<button class="btn btn-highlight btn-sm" onclick="go('add-notice')">${svgOf('plus')} Add Notice</button>`}
+    </div>
+  </div>`;
+}
+
+function shellWrap(innerHtml){
+  return `<div class="shell">${renderSidebar()}<div class="main">${renderTopbar()}<div class="content">${innerHtml}</div></div></div>`;
+}
+
+/* ============================= PAGES: PUBLIC ============================= */
+function pageLanding(){
+  return `
+  <div class="landing-nav">
+    <div class="brand" style="display:flex;align-items:center;gap:10px;">
+      <div class="mark" style="width:30px;height:30px;border-radius:8px;background:var(--highlighter);display:flex;align-items:center;justify-content:center;color:var(--ink);font-family:var(--serif);font-weight:700;">N</div>
+      <span class="serif" style="font-weight:600;font-size:17px;">Notice-to-Action</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="icon-btn" onclick="toggleTheme()">${svgOf(S.theme==='dark'?'sun':'moon')}</button>
+      <button class="btn btn-ghost" onclick="go('login')">Log in</button>
+      <button class="btn btn-primary" onclick="go('register')">Get Started</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div>
+      <h1>Stop Reading Notices.<br><span class="mark-swipe">Start Taking Action.</span></h1>
+      <p class="lede">Notice-to-Action transforms lengthy college notices into clear tasks, deadlines, document checklists, and reminders — so you always know exactly what to do next.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="go('register')">Get Started ${svgOf('arrow')}</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+      </div>
+      <div style="margin-top:34px;display:flex;gap:26px;">
+        <div><div class="serif" style="font-size:22px;font-weight:600;">3</div><div style="font-size:12px;color:var(--ink-soft);">ways to add a notice</div></div>
+        <div><div class="serif" style="font-size:22px;font-weight:600;">11</div><div style="font-size:12px;color:var(--ink-soft);">notice categories</div></div>
+        <div><div class="serif" style="font-size:22px;font-weight:600;">0</div><div style="font-size:12px;color:var(--ink-soft);">invented facts — ever</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="notice-paper">
+        <div class="stamp">NOTICE</div>
+        <h4>Scholarship Renewal</h4>
+        <p>All second-year CSE students are required to submit the scholarship renewal form along with their income certificate and Aadhaar copy on or before September 15…</p>
+      </div>
+      <div class="arrow-flow">${svgOf('arrow')} SMART EXTRACTION ${svgOf('arrow')}</div>
+      <div class="task-card-mini">
+        <div class="tag">ACTION PLAN · DUE SEP 15 · HIGH PRIORITY</div>
+        <h4>Scholarship Renewal</h4>
+        <div class="mini-check"><div class="b"></div> Download scholarship form</div>
+        <div class="mini-check"><div class="b"></div> Obtain income certificate</div>
+        <div class="mini-check"><div class="b"></div> Attach Aadhaar copy</div>
+        <div class="mini-check"><div class="b"></div> Submit completed form</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-section" id="how">
+    <h2 style="font-size:28px;">How it works</h2>
+    <div class="how-grid">
+      <div class="how-card"><div class="num">Step 1</div><h3>Add a notice</h3><p>Paste text, upload a PDF, or upload an image — or enter details manually. Whatever form it arrives in.</p></div>
+      <div class="how-card"><div class="num">Step 2</div><h3>Extract what matters</h3><p>We identify the title, deadline, required documents, target audience, and the exact actions you need to take.</p></div>
+      <div class="how-card"><div class="num">Step 3</div><h3>Take action</h3><p>Get a task checklist, a deadline, a reminder, and a priority — then track completion until it's done.</p></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="max-width:1280px;margin:0 auto;padding:0 48px;"><h2 style="font-size:20px;color:var(--ink-soft);font-weight:600;">Built for every kind of notice</h2></div>
+    <div class="cats-strip">${CATS.map(c=>`<div class="cat-chip">${c}</div>`).join('')}</div>
+  </div>
+
+  <div class="landing-footer">
+    <span class="serif">"Don't just receive the notice. Know what to do next."</span>
+    <span>Notice-to-Action, 2026</span>
+  </div>
+  `;
+}
+
+function pageAuth(){
+  const isLogin = S.authMode==='login';
+  return `
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="mark serif">N</div>
+      <h2 style="font-size:24px;margin-bottom:6px;">${isLogin?'Welcome back':'Create your account'}</h2>
+      <p style="color:var(--ink-soft);font-size:13.5px;margin-bottom:24px;">${isLogin?'Log in to see what needs your attention.':'Turn your first notice into a plan in minutes.'}</p>
+
+      <div class="role-select">
+        ${['student','faculty','admin'].map(r=>`<div class="role-opt ${S.authRole===r?'sel':''}" onclick="S.authRole='${r}';render()">${r[0].toUpperCase()+r.slice(1)}</div>`).join('')}
+      </div>
+
+      ${!isLogin?`<div class="field"><label class="field-label">Full name</label><input id="f-name" type="text" placeholder="e.g. Aditi Sharma"></div>`:''}
+      <div class="field"><label class="field-label">Email</label><input id="f-email" type="email" placeholder="you@college.edu" value="${isLogin?'aditi.sharma@college.edu':''}"></div>
+      <div class="field">
+        <label class="field-label">Password</label>
+        <div class="pw-wrap">
+          <input id="f-pass" type="password" placeholder="••••••••" value="${isLogin?'Demo@1234':''}" oninput="checkPassStrength()">
+          <button type="button" class="pw-toggle" id="pw-toggle-btn" onclick="togglePassVisibility()">${svgOf('eye')}</button>
+        </div>
+        <div id="pw-feedback" class="pw-feedback" style="color:var(--ink-faint)">Needs 8+ characters, uppercase, lowercase, a number, and a special character.</div>
+      </div>
+      ${!isLogin && S.authRole==='student' ? `
+      <div class="grid-2">
+        <div class="field"><label class="field-label">Department</label><input id="f-dept" type="text" placeholder="CSE"></div>
+        <div class="field"><label class="field-label">Year</label><input id="f-year" type="text" placeholder="2nd Year"></div>
+      </div>`:''}
+
+      <button class="btn btn-primary btn-block" style="margin-top:6px;" onclick="submitAuth()">${isLogin?'Log in':'Create account'}</button>
+      <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--ink-soft);">
+        ${isLogin?"Don't have an account?":"Already have an account?"}
+        <a style="font-weight:700;color:var(--ink);cursor:pointer" onclick="go('${isLogin?'register':'login'}')">${isLogin?'Register':'Log in'}</a>
+      </p>
+      <p style="text-align:center;margin-top:20px;"><a style="font-size:12.5px;color:var(--ink-faint);cursor:pointer" onclick="go('landing')">← Back to home</a></p>
+    </div>
+  </div>`;
+}
+
+function isStrongPassword(pw){
+  return pw.length >= 8 && /[a-z]/.test(pw) && /[A-Z]/.test(pw) && /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw);
+}
+function togglePassVisibility(){
+  const inp = document.getElementById('f-pass');
+  const btn = document.getElementById('pw-toggle-btn');
+  if(!inp) return;
+  const show = inp.type==='password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = svgOf(show ? 'eyeOff' : 'eye');
+}
+function checkPassStrength(){
+  const inp = document.getElementById('f-pass');
+  const fb = document.getElementById('pw-feedback');
+  if(!inp || !fb) return;
+  const pw = inp.value;
+  if(!pw){
+    fb.textContent = 'Needs 8+ characters, uppercase, lowercase, a number, and a special character.';
+    fb.style.color = 'var(--ink-faint)';
+    return;
+  }
+  const missing = [];
+  if(pw.length < 8) missing.push('8+ characters');
+  if(!/[A-Z]/.test(pw)) missing.push('an uppercase letter');
+  if(!/[a-z]/.test(pw)) missing.push('a lowercase letter');
+  if(!/[0-9]/.test(pw)) missing.push('a number');
+  if(!/[^A-Za-z0-9]/.test(pw)) missing.push('a special character (e.g. @ # $ !)');
+  if(missing.length){
+    fb.textContent = 'Missing: ' + missing.join(', ');
+    fb.style.color = 'var(--coral)';
+  } else {
+    fb.textContent = 'Strong password ✓';
+    fb.style.color = 'var(--green)';
+  }
+}
+function submitAuth(){
+  const email = document.getElementById('f-email').value.trim() || 'you@college.edu';
+  const isLogin = S.authMode==='login';
+  const pass = document.getElementById('f-pass').value;
+  if(!isLogin && !isStrongPassword(pass)){
+    checkPassStrength();
+    showToast('Password needs upper, lower, a number, and a special character');
+    return;
+  }
+  const name = isLogin ? (email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : (document.getElementById('f-name').value.trim() || 'Student User');
+  const dept = document.getElementById('f-dept') ? document.getElementById('f-dept').value : 'CSE';
+  const year = document.getElementById('f-year') ? document.getElementById('f-year').value : '2nd Year';
+  S.session = {name, email, role:S.authRole, department: dept || 'CSE', year: year || '2nd Year'};
+  if(S.notices.length===0) seedDemo();
+  persist();
+  showToast(`Welcome, ${name.split(' ')[0]}!`);
+  go(S.authRole==='faculty' ? 'faculty' : S.authRole==='admin' ? 'admin' : 'dashboard');
+}
+function logout(){ S.session=null; go('landing'); }
+
+/* ============================= PAGES: STUDENT ============================= */
+function pageDashboard(){
+  const s = S.session;
+  const pending = S.tasks.filter(t=>t.status!=='Completed').length;
+  const dueSoon = S.tasks.filter(t=>{const d=daysUntil(t.deadline); return t.status!=='Completed' && d!==null && d<=3 && d>=0;}).length;
+  const completed = S.tasks.filter(t=>t.status==='Completed').length;
+  const important = S.notices.filter(n=>n.priority==='High').length;
+
+  const upcoming = [...S.notices].filter(n=>n.deadline).sort((a,b)=>a.deadline.localeCompare(b.deadline)).slice(0,4);
+  const todayTasks = S.tasks.filter(t=>t.status!=='Completed').slice(0,5);
+
+  return `
+  <div class="page-head">
+    <div><h1>Good morning, ${s.name.split(' ')[0]} 👋</h1><div class="sub">Here are the things that need your attention.</div></div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="card stat-card"><div class="n">${String(pending).padStart(2,'0')}</div><div class="l">Pending Tasks</div></div>
+    <div class="card stat-card"><div class="n" style="color:var(--coral)">${String(dueSoon).padStart(2,'0')}</div><div class="l">Due Soon</div></div>
+    <div class="card stat-card"><div class="n" style="color:var(--green)">${String(completed).padStart(2,'0')}</div><div class="l">Completed</div></div>
+    <div class="card stat-card"><div class="n">${String(important).padStart(2,'0')}</div><div class="l">Important Notices</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="section-label">Upcoming deadlines</div>
+      ${upcoming.map(n=>{
+        const d = daysUntil(n.deadline);
+        return `<div class="deadline-row">
+          <div>
+            <div class="dl-title">${n.title}</div>
+            <div class="dl-meta">Due: ${fmtDate(n.deadline)} · ${d<0?'Overdue':d===0?'Due today':d+' days remaining'}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="go('notice-detail',{activeNotice:'${n.id}'})">View</button>
+        </div>`;
+      }).join('') || `<div class="empty-state"><div class="t">Nothing due yet</div></div>`}
+
+      <div class="divider"></div>
+      <div class="section-label">Today's tasks</div>
+      ${todayTasks.map(t=>`
+        <div class="checkline ${t.status==='Completed'?'done':''}">
+          <div class="checkbox ${t.status==='Completed'?'done':''}" onclick="toggleTask('${t.id}')">${svgOf('check')}</div>
+          <div class="clabel" style="font-size:13.8px;">${t.name}</div>
+        </div>`).join('') || `<div class="empty-state"><div class="t">All caught up</div></div>`}
+    </div>
+
+    <div class="card">
+      <div class="section-label">Quick actions</div>
+      <div class="quick-actions">
+        <div class="qa-btn" onclick="go('add-notice')">${svgOf('plus')}<span>Add Notice</span></div>
+        <div class="qa-btn" onclick="go('tasks')">${svgOf('tasks')}<span>View Tasks</span></div>
+        <div class="qa-btn" onclick="go('calendar')">${svgOf('cal')}<span>Calendar</span></div>
+        <div class="qa-btn" onclick="go('search')">${svgOf('search')}<span>Search Notices</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label">Recent notices</div>
+      ${S.notices.slice(0,3).map(n=>`
+        <div class="notice-card" style="padding:11px 0;cursor:pointer" onclick="go('notice-detail',{activeNotice:'${n.id}'})">
+          <div class="cat-icon">${svgOf(CAT_ICON[n.category]||'notice')}</div>
+          <div class="body"><div class="ttl" style="font-size:13.3px;">${n.title}</div><div class="meta"><span>${n.category}</span></div></div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function pageBrowse(){
+  return `
+  <div class="page-head"><div><h1>Notices</h1><div class="sub">Everything published for you, organized in one place.</div></div>
+    <button class="btn btn-highlight" onclick="go('add-notice')">${svgOf('plus')} Add Notice</button></div>
+  <div class="card">
+    ${S.notices.map(n=>`
+      <div class="notice-card" style="cursor:pointer" onclick="go('notice-detail',{activeNotice:'${n.id}'})">
+        <div class="cat-icon">${svgOf(CAT_ICON[n.category]||'notice')}</div>
+        <div class="body">
+          <div class="row1"><span class="ttl">${n.title}</span><span class="pill ${priorityPillClass(n.priority)}">${n.priority}</span></div>
+          <div class="meta"><span>${n.category}</span><span>${n.target||'All students'}</span><span>Due ${fmtDate(n.deadline)||'—'}</span></div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function pageAddNotice(){
+  return `
+  <div class="page-head"><div><h1>Add Notice</h1><div class="sub">Paste, upload, or enter a notice manually — we'll turn it into a plan.</div></div></div>
+  <div class="method-tabs">
+    <div class="mtab ${S.addMethod==='paste'?'active':''}" onclick="S.addMethod='paste';render()">Paste Notice</div>
+    <div class="mtab ${S.addMethod==='upload'?'active':''}" onclick="S.addMethod='upload';render()">Upload File</div>
+    <div class="mtab ${S.addMethod==='manual'?'active':''}" onclick="S.addMethod='manual';render()">Manual Entry</div>
+  </div>
+  <div class="card" style="max-width:640px;">
+    ${S.addMethod==='paste' ? `
+      <textarea id="paste-area" rows="8" placeholder="Paste your college notice here...">${S.noticeDraft}</textarea>
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="analyzeFromPaste()">Analyze Notice</button>
+      <p class="extract-hint" style="margin-top:10px;">Try the sample: "All second-year CSE students are required to submit the scholarship renewal form along with their income certificate and Aadhaar copy on or before September 15."</p>
+    ` : S.addMethod==='upload' ? `
+      <div class="upload-drop">${svgOf('upload')}<div style="margin-top:10px;font-weight:600;color:var(--ink);">Drop a PDF, JPG or PNG here</div><div style="font-size:12.5px;margin-top:4px;">or click to browse (PDF/OCR extraction ships in a later release)</div></div>
+      <button class="btn btn-primary" style="margin-top:16px;" disabled>Upload & Analyze</button>
+    ` : `
+      <div class="field"><label class="field-label">Notice title</label><input id="m-title" type="text" placeholder="e.g. Scholarship Renewal"></div>
+      <div class="field"><label class="field-label">Description</label><textarea id="m-desc" rows="4" placeholder="Full notice text"></textarea></div>
+      <div class="grid-2">
+        <div class="field"><label class="field-label">Deadline</label><input id="m-deadline" type="date"></div>
+        <div class="field"><label class="field-label">Category</label><select id="m-cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label class="field-label">Required documents (comma separated)</label><input id="m-docs" type="text" placeholder="Income Certificate, Aadhaar Copy"></div>
+      <button class="btn btn-primary" onclick="createManual()">Create Action Plan</button>
+    `}
+  </div>`;
+}
+
+function analyzeFromPaste(){
+  const txt = document.getElementById('paste-area').value.trim();
+  if(!txt){ showToast('Paste a notice first'); return; }
+  S.noticeDraft = txt;
+  S.pendingExtract = extractNotice(txt);
+  go('analyzing');
+  setTimeout(()=>go('review'), 1900);
+}
+function createManual(){
+  const title = document.getElementById('m-title').value.trim() || 'Untitled Notice';
+  const desc = document.getElementById('m-desc').value.trim();
+  const deadline = document.getElementById('m-deadline').value || null;
+  const cat = document.getElementById('m-cat').value;
+  const docs = document.getElementById('m-docs').value.split(',').map(s=>s.trim()).filter(Boolean);
+  S.pendingExtract = {title, category:cat, deadline, target:null, priority: deadline? 'Medium':'Low', documents:docs,
+    actions: docs.length? ['Download the required form', ...docs.map(d=>`Obtain / attach ${d}`), 'Submit before the deadline'] : ['Complete the required step'],
+    description: desc || title};
+  go('review');
+}
+
+function pageAnalyzing(){
+  const steps = ['Reading notice','Identifying important dates','Finding required actions','Finding required documents','Creating action checklist'];
+  return `
+  <div class="analyze-loading">
+    <h2 style="font-size:20px;margin-bottom:20px;">Analyzing your notice…</h2>
+    ${steps.map((s,i)=>`<div class="analyze-step" style="animation-delay:${i*0.3}s">${svgOf('check')}<span>${s}</span></div>`).join('')}
+  </div>`;
+}
+
+function pageReview(){
+  const e = S.pendingExtract;
+  if(!e) return `<div class="empty-state"><div class="t">Nothing to review</div></div>`;
+  return `
+  <div class="page-head"><div><h1>${e.title}</h1><div class="sub">Review the extracted plan, then save it.</div></div></div>
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="grid-2" style="margin-bottom:8px;">
+          <div><div class="section-label">Category</div><div style="font-weight:600;">${e.category}</div></div>
+          <div><div class="section-label">For</div><div style="font-weight:600;">${e.target || '<span class="not-specified">Not specified in the notice.</span>'}</div></div>
+          <div><div class="section-label">Deadline</div><div style="font-weight:600;">${e.deadline ? fmtDate(e.deadline) : '<span class="not-specified">Not specified in the notice.</span>'}</div></div>
+          <div><div class="section-label">Priority</div><span class="pill ${priorityPillClass(e.priority)}">${e.priority}</span></div>
+        </div>
+        ${!e.deadline ? `<div class="warn-box" style="margin-top:10px;">${svgOf('warn')}<span>This notice doesn't state a clear deadline. Please verify with the official source.</span></div>`:''}
+
+        <div class="divider"></div>
+        <div class="section-label">Required actions</div>
+        ${e.actions.map(a=>`<div class="checkline"><div class="checkbox"></div><div class="clabel">${a}</div></div>`).join('')}
+
+        <div class="divider"></div>
+        <div class="section-label">Required documents</div>
+        ${e.documents.length? e.documents.map(d=>`<span class="doc-chip">${svgOf('doc')}${d}</span>`).join('') : `<span class="not-specified">Not specified in the notice.</span>`}
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="section-label">Remind me</div>
+        <select id="remind-select">
+          <option value="1">1 day before</option>
+          <option value="2" selected>2 days before</option>
+          <option value="3">3 days before</option>
+          <option value="7">1 week before</option>
+        </select>
+        <div class="divider"></div>
+        <div class="warn-box">${svgOf('warn')}<span>Always verify important information against the original notice before you rely on it.</span></div>
+        <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="saveActionPlan()">Save Action Plan</button>
+        <button class="btn btn-text btn-block" style="margin-top:6px;justify-content:center;" onclick="go('add-notice')">Discard & go back</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveActionPlan(){
+  const e = S.pendingExtract;
+  const id = 'n'+Math.random().toString(36).slice(2,9);
+  const notice = {id, title:e.title, category:e.category, target:e.target, deadline:e.deadline, priority:e.priority,
+    description:e.description, documents:e.documents.length?e.documents:['Not specified in the notice.'],
+    actions: e.actions.map(a=>[a,false]), source:'You (manually added)', createdAt:'2026-09-03'};
+  S.notices.unshift(notice);
+  e.actions.forEach(a=>{
+    S.tasks.push({id:'t'+Math.random().toString(36).slice(2,9), noticeId:id, name:a, deadline:e.deadline, priority:e.priority, status:'Pending'});
+  });
+  if(e.deadline){
+    S.notifications.unshift({id:'no'+Math.random().toString(36).slice(2,9), level:'info', msg:`Reminder set for ${notice.title}.`, time:'now', read:false, noticeId:id});
+  }
+  S.pendingExtract = null; S.noticeDraft='';
+  persist();
+  showToast('Action plan saved');
+  go('notice-detail', {activeNotice:id});
+}
+
+function pageNoticeDetail(){
+  const n = noticeById(S.activeNotice);
+  if(!n) return `<div class="empty-state"><div class="t">Notice not found</div></div>`;
+  const ts = tasksForNotice(n.id);
+  const pct = progressForNotice(n.id);
+  return `
+  <a class="btn-text" style="display:inline-block;margin-bottom:14px;" onclick="go('browse')">← Back to notices</a>
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div><h1 style="font-size:22px;">${n.title}</h1>
+          <div class="sub" style="margin-top:6px;">${n.source||'—'} · Received ${n.createdAt}</div></div>
+          <span class="pill ${priorityPillClass(n.priority)}">${n.priority==='High'?'🔴':n.priority==='Medium'?'🟡':'🟢'} ${n.priority}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="grid-2">
+          <div><div class="section-label">Deadline</div><div style="font-weight:600;">${n.deadline?fmtDate(n.deadline)+', 2026':'<span class="not-specified">Not specified</span>'}</div></div>
+          <div><div class="section-label">Target audience</div><div style="font-weight:600;">${n.target||'<span class="not-specified">Not specified</span>'}</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-label">Description</div>
+        <p style="font-size:13.8px;line-height:1.7;color:var(--ink-soft)">${n.description}</p>
+        <div class="divider"></div>
+        <div class="section-label">Action checklist</div>
+        ${ts.map(t=>`<div class="checkline ${t.status==='Completed'?'done':''}">
+          <div class="checkbox ${t.status==='Completed'?'done':''}" onclick="toggleTask('${t.id}')">${svgOf('check')}</div>
+          <div class="clabel">${t.name}</div></div>`).join('')}
+        <div class="divider"></div>
+        <div class="section-label">Progress — ${pct}% completed</div>
+        <div class="progress"><div style="width:${pct}%"></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="section-label">Required documents</div>
+        ${n.documents.map(d=> d==='Not specified in the notice.' ? `<span class="not-specified">${d}</span>` : `<span class="doc-chip">${svgOf('doc')}${d}</span>`).join('')}
+        <div class="divider"></div>
+        <div class="section-label">Reminder</div>
+        <div style="font-size:13.5px;">${n.deadline ? `Reminder set for ${fmtDate(dateMinus(n.deadline,2))}` : 'No reminder set'}</div>
+        <div class="divider"></div>
+        <div class="section-label">Original document</div>
+        ${n.attachment ? `
+          <a href="${n.attachment.dataUrl}" download="${n.attachment.name}" class="file-preview" style="text-decoration:none;color:inherit;">
+            ${n.attachment.type && n.attachment.type.startsWith('image/') ? `<img class="thumb" src="${n.attachment.dataUrl}">` : `<div class="doc-thumb">${svgOf('doc')}</div>`}
+            <div style="flex:1;min-width:0;"><div class="fname">${n.attachment.name}</div><div class="fsize">${n.attachment.sizeLabel} · Click to open</div></div>
+          </a>` : `<span class="not-specified">No file attached to this notice.</span>`}
+        <div class="divider"></div>
+        <div class="warn-box">${svgOf('warn')}<span>Always verify important information against the original notice.</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function dateMinus(iso,days){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()-days); return d.toISOString().slice(0,10); }
+
+function toggleTask(id){
+  const t = S.tasks.find(x=>x.id===id);
+  if(!t) return;
+  t.status = t.status==='Completed' ? 'Pending' : 'Completed';
+  if(t.status==='Completed'){
+    S.notifications.unshift({id:'no'+Math.random().toString(36).slice(2,9), level:'low', msg:`"${t.name}" marked complete.`, time:'now', read:false, noticeId:t.noticeId});
+  }
+  persist(); render();
+}
+
+function pageTasks(){
+  let list = S.tasks;
+  if(S.taskTab==='pending') list = list.filter(t=>t.status==='Pending');
+  if(S.taskTab==='due') list = list.filter(t=>{const d=daysUntil(t.deadline); return t.status!=='Completed' && d!==null && d<=3;});
+  if(S.taskTab==='done') list = list.filter(t=>t.status==='Completed');
+  return `
+  <div class="page-head"><div><h1>My Tasks</h1><div class="sub">Every action item from every notice, in one list.</div></div></div>
+  <div class="tab-row">
+    ${[['all','All'],['pending','Pending'],['due','Due Soon'],['done','Completed']].map(([k,l])=>`<div class="tab-item ${S.taskTab===k?'active':''}" onclick="S.taskTab='${k}';render()">${l}</div>`).join('')}
+  </div>
+  <div class="card">
+    ${list.length? list.map(t=>{
+      const n = noticeById(t.noticeId);
+      const d = daysUntil(t.deadline);
+      return `<div class="notice-card">
+        <div class="checkbox ${t.status==='Completed'?'done':''}" style="margin-top:4px" onclick="toggleTask('${t.id}')">${svgOf('check')}</div>
+        <div class="body">
+          <div class="row1"><span class="ttl" style="${t.status==='Completed'?'text-decoration:line-through;color:var(--ink-faint)':''}">${t.name}</span><span class="pill ${priorityPillClass(t.priority)}">${t.priority}</span></div>
+          <div class="meta"><span>${n?n.title:'—'}</span><span>${t.deadline? 'Due '+fmtDate(t.deadline) : 'No deadline'}</span><span>${t.status}${d!==null&&d<0&&t.status!=='Completed'?' · Overdue':''}</span></div>
+        </div>
+        ${t.status!=='Completed'?`<button class="btn btn-ghost btn-sm" onclick="toggleTask('${t.id}')">Mark Complete</button>`:''}
+      </div>`;
+    }).join('') : `<div class="empty-state">${svgOf('tasks')}<div class="t">Nothing here</div><div class="d">Tasks matching this filter will show up here.</div></div>`}
+  </div>`;
+}
+
+function pageCalendar(){
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const y = S.calYear, m = S.calMonth;
+  const first = new Date(y,m,1);
+  const startDow = (first.getDay()+6)%7; // Mon=0
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const cells = [];
+  for(let i=0;i<startDow;i++) cells.push(null);
+  for(let d=1; d<=daysInMonth; d++) cells.push(d);
+  const isoOf = d => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const notesByDay = {};
+  S.notices.forEach(n=>{ if(n.deadline) (notesByDay[n.deadline]=notesByDay[n.deadline]||[]).push(n); });
+  const selIso = isoOf(S.calSelected);
+  const selNotices = notesByDay[selIso] || [];
+
+  return `
+  <div class="page-head"><div><h1>Calendar</h1><div class="sub">${monthNames[m]} ${y}</div></div></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="cal-grid">
+        ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-dow">${d}</div>`).join('')}
+        ${cells.map(d=>{
+          if(!d) return `<div class="cal-cell empty"></div>`;
+          const iso = isoOf(d);
+          const has = notesByDay[iso];
+          const isToday = iso==='2026-09-03';
+          const isSel = d===S.calSelected;
+          return `<div class="cal-cell ${isToday?'today':''} ${isSel?'sel':''}" onclick="S.calSelected=${d};render()">${d}${has?'<div class="cal-dot"></div>':''}</div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-label">${monthNames[m]} ${S.calSelected}</div>
+      ${selNotices.length? selNotices.map(n=>`
+        <div style="margin-bottom:12px;cursor:pointer" onclick="go('notice-detail',{activeNotice:'${n.id}'})">
+          <div style="font-weight:600;font-size:13.8px;">${n.title}</div>
+          <span class="pill ${priorityPillClass(n.priority)}">${n.priority==='High'?'🔴':n.priority==='Medium'?'🟡':'🟢'} ${n.priority} Priority</span>
+        </div>`).join('') : `<div class="empty-state" style="padding:24px 10px;">${svgOf('cal')}<div class="d">Nothing due on this day.</div></div>`}
+    </div>
+  </div>`;
+}
+
+function pageNotifications(){
+  const levelColor = {high:'var(--coral)', medium:'var(--highlighter)', low:'var(--green)', info:'var(--ink-soft)'};
+  const levelIcon = {high:'🔴', medium:'🟡', low:'🟢', info:'📢'};
+  return `
+  <div class="page-head"><div><h1>Notifications</h1><div class="sub">Everything that needs your attention, in order.</div></div>
+    <button class="btn btn-ghost" onclick="clearNotifs()">Clear all</button></div>
+  <div class="card">
+    ${S.notifications.length? S.notifications.map(n=>`
+      <div class="notif-row ${!n.read?'unread':''}">
+        <div style="font-size:16px">${levelIcon[n.level]}</div>
+        <div style="flex:1">
+          <div style="font-size:13.8px;font-weight:${!n.read?'700':'500'};">${n.msg}</div>
+          <div style="font-size:11.5px;color:var(--ink-faint);margin-top:3px;">${n.time}</div>
+        </div>
+        ${!n.read?`<button class="btn-text btn-sm" onclick="markRead('${n.id}')">Mark read</button>`:''}
+      </div>`).join('') : `<div class="empty-state">${svgOf('bell')}<div class="t">You're all caught up</div></div>`}
+  </div>`;
+}
+function markRead(id){ const n=S.notifications.find(x=>x.id===id); if(n) n.read=true; persist(); render(); }
+function clearNotifs(){ S.notifications=[]; persist(); render(); }
+
+function pageSearch(){
+  const q = S.searchQuery.toLowerCase();
+  let results = S.notices.filter(n => (!q || n.title.toLowerCase().includes(q) || n.description.toLowerCase().includes(q)) && (S.searchCat==='All' || n.category===S.searchCat));
+  return `
+  <div class="page-head"><div><h1>Search</h1><div class="sub">Find any notice by keyword, category, or deadline.</div></div></div>
+  <div class="card" style="margin-bottom:18px;">
+    <div class="topbar-search" style="width:100%;margin-bottom:14px;">
+      ${svgOf('search')}<input id="search-input" placeholder="Scholarship, Exam, Placement…" value="${S.searchQuery}" oninput="S.searchQuery=this.value;renderSearchResultsOnly()">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <div class="cat-chip" style="cursor:pointer;${S.searchCat==='All'?'background:var(--ink);color:var(--paper);':''}" onclick="S.searchCat='All';render()">All</div>
+      ${CATS.map(c=>`<div class="cat-chip" style="cursor:pointer;${S.searchCat===c?'background:var(--ink);color:var(--paper);':''}" onclick="S.searchCat='${c}';render()">${c}</div>`).join('')}
+    </div>
+  </div>
+  <div class="card" id="search-results">
+    ${results.length? results.map(n=>`
+      <div class="notice-card" style="cursor:pointer" onclick="go('notice-detail',{activeNotice:'${n.id}'})">
+        <div class="cat-icon">${svgOf(CAT_ICON[n.category]||'notice')}</div>
+        <div class="body"><div class="row1"><span class="ttl">${n.title}</span><span class="pill ${priorityPillClass(n.priority)}">${n.priority}</span></div>
+        <div class="meta"><span>${n.category}</span><span>Due ${fmtDate(n.deadline)||'—'}</span></div></div>
+      </div>`).join('') : `<div class="empty-state">${svgOf('search')}<div class="t">No matches</div><div class="d">Try a different keyword or category.</div></div>`}
+  </div>`;
+}
+function renderSearchResultsOnly(){ render(); const inp=document.getElementById('search-input'); if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length,inp.value.length);} }
+
+function pageProfile(){
+  const s = S.session;
+  return `
+  <div class="page-head"><div><h1>Profile</h1></div></div>
+  <div class="card" style="max-width:520px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div class="avatar" style="width:52px;height:52px;font-size:18px;">${s.name.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+      <div><div style="font-weight:700;font-size:16px;">${s.name}</div><div style="font-size:12.5px;color:var(--ink-soft);">${s.email}</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label class="field-label">Name</label><input type="text" value="${s.name}"></div>
+      <div class="field"><label class="field-label">Email</label><input type="text" value="${s.email}"></div>
+      <div class="field"><label class="field-label">Department</label><input type="text" value="${s.department||''}"></div>
+      <div class="field"><label class="field-label">Year</label><input type="text" value="${s.year||''}"></div>
+    </div>
+    <div class="field"><label class="field-label">College</label><input type="text" value="Institute of Technology"></div>
+    <div class="field"><label class="field-label">Preferred reminder time</label><select><option>Morning (8:00 AM)</option><option selected>Afternoon (1:00 PM)</option><option>Evening (6:00 PM)</option></select></div>
+    <button class="btn btn-primary" onclick="showToast('Profile updated')">Save changes</button>
+  </div>`;
+}
+
+function pageSettings(){
+  const st = S.settings;
+  const row = (key,title,desc) => `<div class="setting-row"><div><div class="st">${title}</div><div class="sd">${desc}</div></div><div class="switch ${st[key]?'on':''}" onclick="toggleSetting('${key}')"><div class="knob"></div></div></div>`;
+  return `
+  <div class="page-head"><div><h1>Settings</h1></div></div>
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="section-label">Notifications</div>
+        ${row('deadlineReminders','Deadline reminders','Get notified as deadlines approach')}
+        ${row('newNotices','New notices','Notify me when a new notice is published')}
+        ${row('taskCompletion','Task completion','Confirm when I complete a task')}
+        ${row('importantNotices','Important notices','Always notify me for high-priority notices')}
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="section-label">Reminders</div>
+        <div class="field"><label class="field-label">Default reminder time</label>
+          <select onchange="S.settings.defaultReminder=this.value;persist()">
+            <option value="1" ${st.defaultReminder==='1'?'selected':''}>1 day before</option>
+            <option value="2" ${st.defaultReminder==='2'?'selected':''}>2 days before</option>
+            <option value="3" ${st.defaultReminder==='3'?'selected':''}>3 days before</option>
+            <option value="7" ${st.defaultReminder==='7'?'selected':''}>1 week before</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="section-label">Appearance</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn ${S.theme==='light'?'btn-primary':'btn-ghost'}" style="flex:1" onclick="setTheme('light')">${svgOf('sun')} Light</button>
+          <button class="btn ${S.theme==='dark'?'btn-primary':'btn-ghost'}" style="flex:1" onclick="setTheme('dark')">${svgOf('moon')} Dark</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="section-label">Account</div>
+        <button class="btn btn-ghost btn-block" style="margin-bottom:8px;" onclick="showToast('Password change link sent')">Change password</button>
+        <button class="btn btn-danger btn-block" onclick="logout()">${svgOf('logout')} Log out</button>
+      </div>
+    </div>
+  </div>`;
+}
+function toggleSetting(k){ S.settings[k]=!S.settings[k]; persist(); render(); }
+function setTheme(t){ S.theme=t; document.documentElement.setAttribute('data-theme',t); persist(); render(); }
+function toggleTheme(){ setTheme(S.theme==='dark'?'light':'dark'); }
+
+/* ============================= PAGES: FACULTY ============================= */
+function pageFaculty(){
+  const s = S.session;
+  return `
+  <div class="page-head"><div><h1>Faculty Dashboard</h1><div class="sub">${s.name} · Published notices at a glance.</div></div>
+    <button class="btn btn-highlight" onclick="go('faculty-create')">${svgOf('plus')} New Notice</button></div>
+  <div class="stat-grid">
+    <div class="card stat-card"><div class="n">${S.notices.length}</div><div class="l">Published Notices</div></div>
+    <div class="card stat-card"><div class="n">${S.notices.filter(n=>daysUntil(n.deadline)>=0 || !n.deadline).length}</div><div class="l">Active Notices</div></div>
+    <div class="card stat-card"><div class="n">${S.notices.filter(n=>n.deadline && daysUntil(n.deadline)<0).length}</div><div class="l">Expired Notices</div></div>
+    <div class="card stat-card"><div class="n">420</div><div class="l">Students Reached</div></div>
+  </div>
+  <div class="card">
+    <div class="section-label">Recently published</div>
+    ${S.notices.map(n=>`
+      <div class="notice-card">
+        <div class="cat-icon">${svgOf(CAT_ICON[n.category]||'notice')}</div>
+        <div class="body"><div class="row1"><span class="ttl">${n.title}</span><span class="pill ${priorityPillClass(n.priority)}">${n.priority}</span></div>
+        <div class="meta"><span>${n.category}</span><span>${n.target||'All students'}</span><span>Due ${fmtDate(n.deadline)||'—'}</span></div></div>
+      </div>`).join('')}
+  </div>`;
+}
+function pageFacultyCreate(){
+  return `
+  <div class="page-head"><div><h1>Create Notice</h1><div class="sub">Publish an official notice to your students.</div></div></div>
+  <div class="card" style="max-width:640px;">
+    <div class="field"><label class="field-label">Notice title</label><input id="fc-title" type="text" placeholder="e.g. Scholarship Renewal Submission"></div>
+    <div class="field"><label class="field-label">Description</label><textarea id="fc-desc" rows="4" placeholder="Full notice text"></textarea></div>
+    <div class="grid-2">
+      <div class="field"><label class="field-label">Category</label><select id="fc-cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">Priority</label><select id="fc-pri"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+      <div class="field"><label class="field-label">Target department</label><input id="fc-dept" type="text" placeholder="CSE"></div>
+      <div class="field"><label class="field-label">Target year</label><input id="fc-year" type="text" placeholder="2nd Year"></div>
+      <div class="field"><label class="field-label">Publish date</label><input id="fc-pub" type="date" value="2026-09-03"></div>
+      <div class="field"><label class="field-label">Deadline</label><input id="fc-deadline" type="date"></div>
+    </div>
+    <div class="field"><label class="field-label">Required documents (comma separated)</label><input id="fc-docs" type="text" placeholder="Income Certificate, Aadhaar Copy"></div>
+    <div class="field">
+      <label class="field-label">Attachment</label>
+      <input type="file" id="fc-file" accept=".pdf,.jpg,.jpeg,.png,image/*,application/pdf" style="display:none" onchange="handleFacultyFile(event)">
+      ${facultyAttachmentHtml()}
+    </div>
+    <button class="btn btn-primary" onclick="publishNotice()">Publish Notice</button>
+  </div>`;
+}
+function facultyAttachmentHtml(){
+  const a = S.facultyAttachment;
+  if(!a){
+    return `<div class="upload-drop" onclick="document.getElementById('fc-file').click()">
+      ${svgOf('upload')}
+      <div style="margin-top:10px;font-weight:600;color:var(--ink);">Drop a PDF, JPG or PNG here</div>
+      <div style="font-size:12.5px;margin-top:4px;">or click to browse · up to 4 MB</div>
+    </div>`;
+  }
+  const isImage = a.type && a.type.startsWith('image/');
+  return `<div class="file-preview">
+    ${isImage ? `<img class="thumb" src="${a.dataUrl}">` : `<div class="doc-thumb">${svgOf('doc')}</div>`}
+    <div style="flex:1;min-width:0;">
+      <div class="fname">${a.name}</div>
+      <div class="fsize">${a.sizeLabel}</div>
+    </div>
+    <button type="button" class="icon-btn" onclick="removeFacultyAttachment(event)" title="Remove">${svgOf('trash')}</button>
+  </div>`;
+}
+function handleFacultyFile(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file) return;
+  const okTypes = ['application/pdf','image/jpeg','image/jpg','image/png'];
+  if(!okTypes.includes(file.type)){
+    showToast('Only PDF, JPG, or PNG files are supported');
+    evt.target.value = '';
+    return;
+  }
+  if(file.size > 4 * 1024 * 1024){
+    showToast('File is too large — please keep it under 4 MB');
+    evt.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    S.facultyAttachment = {
+      name: file.name,
+      type: file.type,
+      sizeLabel: (file.size/1024).toFixed(0) + ' KB',
+      dataUrl: reader.result
+    };
+    render();
+  };
+  reader.onerror = () => showToast('Could not read that file — try again');
+  reader.readAsDataURL(file);
+}
+function removeFacultyAttachment(evt){
+  if(evt) evt.stopPropagation();
+  S.facultyAttachment = null;
+  const inp = document.getElementById('fc-file');
+  if(inp) inp.value = '';
+  render();
+}
+function publishNotice(){
+  const title = document.getElementById('fc-title').value.trim() || 'Untitled Notice';
+  const desc = document.getElementById('fc-desc').value.trim();
+  const cat = document.getElementById('fc-cat').value;
+  const pri = document.getElementById('fc-pri').value;
+  const dept = document.getElementById('fc-dept').value.trim();
+  const year = document.getElementById('fc-year').value.trim();
+  const deadline = document.getElementById('fc-deadline').value || null;
+  const docs = document.getElementById('fc-docs').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const id = 'n'+Math.random().toString(36).slice(2,9);
+  S.notices.unshift({id, title, category:cat, priority:pri, target:[year,dept].filter(Boolean).join(' '), deadline,
+    description: desc || title, documents: docs.length?docs:['Not specified in the notice.'],
+    actions: docs.map(d=>[`Obtain / attach ${d}`,false]).concat([['Submit before the deadline',false]]),
+    source: S.session.name, createdAt:'2026-09-03', attachment: S.facultyAttachment});
+  S.facultyAttachment = null;
+  persist();
+  showToast('Notice published');
+  go('faculty');
+}
+function pageFacultyPublished(){
+  return `
+  <div class="page-head"><div><h1>Published Notices</h1></div></div>
+  <div class="card">
+    ${S.notices.map(n=>`
+      <div class="notice-card">
+        <div class="cat-icon">${svgOf(CAT_ICON[n.category]||'notice')}</div>
+        <div class="body"><div class="row1"><span class="ttl">${n.title}</span><span class="pill ${priorityPillClass(n.priority)}">${n.priority}</span></div>
+        <div class="meta"><span>${n.category}</span><span>${n.target||'All students'}</span><span>Due ${fmtDate(n.deadline)||'—'}</span></div></div>
+      </div>`).join('')}
+  </div>`;
+}
+
+/* ============================= PAGES: ADMIN ============================= */
+function pageAdmin(){
+  return `
+  <div class="page-head"><div><h1>Admin Dashboard</h1><div class="sub">System-wide overview.</div></div></div>
+  <div class="stat-grid">
+    <div class="card stat-card"><div class="n">1,250</div><div class="l">Total Students</div></div>
+    <div class="card stat-card"><div class="n">${S.notices.length + 426}</div><div class="l">Total Notices</div></div>
+    <div class="card stat-card"><div class="n">82</div><div class="l">Active Notices</div></div>
+    <div class="card stat-card"><div class="n">3,420</div><div class="l">Completed Tasks</div></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="section-label">Recent notices</div>
+      ${S.notices.slice(0,5).map(n=>`<div class="notice-card"><div class="cat-icon">${svgOf(CAT_ICON[n.category]||'notice')}</div>
+        <div class="body"><div class="ttl">${n.title}</div><div class="meta"><span>${n.category}</span><span>${n.source||'—'}</span></div></div>
+        <button class="btn btn-ghost btn-sm" onclick="removeNotice('${n.id}')">${svgOf('trash')}</button></div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="section-label">Admin functions</div>
+      <div class="quick-actions">
+        <div class="qa-btn" onclick="go('admin-users')">${svgOf('users')}<span>Manage Students</span></div>
+        <div class="qa-btn" onclick="go('admin-notices')">${svgOf('notice')}<span>Manage Notices</span></div>
+        <div class="qa-btn" onclick="go('admin-cats')">${svgOf('layers')}<span>Manage Categories</span></div>
+        <div class="qa-btn" onclick="showToast('Report generated')">${svgOf('trend')}<span>View Reports</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function removeNotice(id){
+  S.notices = S.notices.filter(n=>n.id!==id);
+  S.tasks = S.tasks.filter(t=>t.noticeId!==id);
+  persist(); showToast('Notice removed'); render();
+}
+function pageAdminUsers(){
+  const demoUsers = [
+    {name:'Aditi Sharma', role:'Student', dept:'CSE, 2nd Year'}, {name:'Rahul Verma', role:'Student', dept:'ECE, 3rd Year'},
+    {name:'Dr. Kavita Rao', role:'Faculty', dept:'CSE Department'}, {name:'Sameer Khan', role:'Student', dept:'ME, 1st Year'},
+  ];
+  return `
+  <div class="page-head"><div><h1>Manage Users</h1></div></div>
+  <div class="card">
+    ${demoUsers.map(u=>`<div class="notice-card"><div class="avatar" style="background:var(--paper-2);color:var(--ink)">${u.name.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+      <div class="body"><div class="ttl">${u.name}</div><div class="meta"><span>${u.role}</span><span>${u.dept}</span></div></div>
+      <span class="pill pill-neutral">Active</span></div>`).join('')}
+  </div>`;
+}
+function pageAdminNotices(){
+  return `
+  <div class="page-head"><div><h1>Manage Notices</h1></div></div>
+  <div class="card">
+    ${S.notices.map(n=>`<div class="notice-card"><div class="cat-icon">${svgOf(CAT_ICON[n.category]||'notice')}</div>
+      <div class="body"><div class="ttl">${n.title}</div><div class="meta"><span>${n.category}</span><span>${n.source||'—'}</span></div></div>
+      <button class="btn btn-ghost btn-sm" onclick="removeNotice('${n.id}')">Remove</button></div>`).join('')}
+  </div>`;
+}
+function pageAdminCats(){
+  return `
+  <div class="page-head"><div><h1>Manage Categories</h1></div></div>
+  <div class="cats-strip" style="padding:0;max-width:none;">${CATS.map(c=>`<div class="cat-chip" style="display:flex;align-items:center;gap:8px;">${svgOf(CAT_ICON[c]||'notice')} ${c} <span style="color:var(--ink-faint)">· ${S.notices.filter(n=>n.category===c).length}</span></div>`).join('')}</div>`;
+}
+
+/* ============================= ROUTER / RENDER ============================= */
+function render(){
+  document.documentElement.setAttribute('data-theme', S.theme);
+  let html = '';
+  if(!S.session){
+    if(S.route==='login'){ S.authMode='login'; html = pageAuth(); }
+    else if(S.route==='register'){ S.authMode='register'; html = pageAuth(); }
+    else { html = pageLanding(); S.route='landing'; }
+    document.getElementById('app').innerHTML = html + (S.toast?toastHtml():'');
+    return;
+  }
+  let inner;
+  switch(S.route){
+    case 'dashboard': inner = pageDashboard(); break;
+    case 'browse': inner = pageBrowse(); break;
+    case 'add-notice': inner = pageAddNotice(); break;
+    case 'analyzing': inner = pageAnalyzing(); break;
+    case 'review': inner = pageReview(); break;
+    case 'notice-detail': inner = pageNoticeDetail(); break;
+    case 'tasks': inner = pageTasks(); break;
+    case 'calendar': inner = pageCalendar(); break;
+    case 'notifications': inner = pageNotifications(); break;
+    case 'search': inner = pageSearch(); break;
+    case 'profile': inner = pageProfile(); break;
+    case 'settings': inner = pageSettings(); break;
+    case 'faculty': inner = pageFaculty(); break;
+    case 'faculty-create': inner = pageFacultyCreate(); break;
+    case 'faculty-published': inner = pageFacultyPublished(); break;
+    case 'admin': inner = pageAdmin(); break;
+    case 'admin-users': inner = pageAdminUsers(); break;
+    case 'admin-notices': inner = pageAdminNotices(); break;
+    case 'admin-cats': inner = pageAdminCats(); break;
+    default: inner = pageDashboard();
+  }
+  document.getElementById('app').innerHTML = shellWrap(inner) + (S.toast?toastHtml():'');
+}
+function toastHtml(){ return `<div class="toast">${svgOf('check')}<span>${S.toast}</span></div>`; }
+
+/* ============================= BOOT ============================= */
+(async function boot(){
+  await loadPersisted();
+  document.documentElement.setAttribute('data-theme', S.theme);
+  if(S.session && S.notices.length===0) seedDemo();
+  render();
+})();
+</script>
+</body>
+</html>
