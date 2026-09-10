@@ -10,6 +10,48 @@ Users | Notices | Tasks | Documents | Reminders | Notifications   ← sheet tabs
 
 ---
 
+## Design Thinking Process
+
+This project was built following the Design Thinking process — Empathize, Define, Ideate,
+Prototype, Test, Iterate — with the full documentation trail kept in [`/docs`](./docs):
+
+```
+EMPATHIZE                DEFINE                    IDEATE
+Understand users    →    Identify the core     →   Generate possible
+                          problem                   solutions
+                                                          ↓
+ITERATE              ←   TEST                  ←   PROTOTYPE
+Improve using             Test with users            Build
+feedback                                              Notice-to-Action
+```
+
+| Phase | Document | What it contains |
+|---|---|---|
+| Empathize | [docs/01-Empathy-Research.md](./docs/01-Empathy-Research.md) | Personas, pain points, observation findings, interview questions |
+| Define | [docs/02-Problem-Statement.md](./docs/02-Problem-Statement.md) | Problem statement, How Might We, design goals, success criteria |
+| Ideate | [docs/03-Ideation-AI-Audit.md](./docs/03-Ideation-AI-Audit.md) | Idea evaluation table, AI-as-divergence-partner audit log |
+| Prototype | this app | The working Notice-to-Action product (frontend + this API) |
+| Test | [docs/04-Prototype-Validation.md](./docs/04-Prototype-Validation.md) | Testing plan, task list, results template (3+ real users) |
+| Iterate | [docs/05-Iteration-Changes.md](./docs/05-Iteration-Changes.md) | Feedback → design decision → implementation change log |
+
+Real user testing status, tester counts, and validation results are tracked as **Pending** in
+those documents until actual testing data is entered — nothing there is fabricated.
+
+### Notice-to-Action Workflow
+
+```
+College Notice
+   → Information Extraction   (POST /api/notices/analyze — deadline, category, documents, target)
+   → Category                 (Academic, Examination, Scholarship, Placement, ...)
+   → Deadline                 (surfaced as a distinct, prominent field)
+   → Required Documents       (checklist, not buried prose)
+   → Action Checklist         (auto-generated Tasks)
+   → Reminder                 (Reminders + Notifications before the deadline)
+   → Task Completion          (progress tracked per user, per notice)
+```
+
+---
+
 ## 1. Create the Google Sheet
 
 1. Go to [sheets.google.com](https://sheets.google.com) and create a new blank spreadsheet.
